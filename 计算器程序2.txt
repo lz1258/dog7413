@@ -1,0 +1,19 @@
+class Token
+{
+    public:
+           typedef double Value;
+           typedef string Property;
+           string name;  
+           Value sync;
+           Property property;
+           
+           Token():sync(0.0){}
+           Token(const string &s):name(s),property(s),sync(0.0) {}
+           Token(const char* s):name(s),property(s),sync(0.0) {}
+           friend bool operator ==(const Token& t1,const Token& t2);
+    
+};
+bool operator ==(const Token& t1,const Token& t2)
+{
+     return t1.name==t2.name;
+}
