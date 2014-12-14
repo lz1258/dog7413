@@ -1,0 +1,74 @@
+class LRpda//定义LL语法分析下推自动机 
+{
+    
+    typedef vector<Token> Engender;//定义产生式
+    typedef int State;
+    typedef string Action;
+    typedef struct eexpr//定义表达式
+            {
+                Token uToken;
+                Engender engender;
+            }eExpr;
+    public:
+        LRpda();
+        bool Caculate(const string& exprtmp);//执行PDA 
+        bool Derivative(const string& exprtmp);
+    private:
+        bool in_propertys(Token::Property pro,vector<Token::Property> &pVec);
+        bool is_unTerminateToken(const Token& token);//判断是否为非终结符 
+        bool is_TerminateToken(const Token& token);//判断是否为终结符
+        bool is_delim(char ch);
+        bool is_operator(char ch);
+        bool is_letter(char ch);
+        bool is_num(const string& str);
+        bool is_num(const Token& token) {}
+        bool is_id(const string& str);
+        bool is_changshu(const string &str);
+        
+        double get_digit(char *&exprtmp);
+        string get_operator(char *&exprtmp);
+        void MatrixToFile(const char* filename);
+        void get_propertys(const char* str,vector<Token::Property> &pVec);
+        Token::Property get_property(const string& str);
+        
+        void addExpr(const Token& token,const Engender& engender);//添加产生式 
+        void addExpr(const Token& token,const string& engender); 
+        
+        void showMatrix();//打印LL语法分析表 
+        void printExpr(const eExpr& expr);
+        
+        Token operate(const Token& t1,const Token& op,const Token& t2);
+        Token operate(const Token& op,const Token& t1);
+        string der_operate(const string& op,const string& t1);
+        string LRpda::der_operate(const Token& t1,const string& d1,const string& op,const Token& t2,const string& d2);
+        Action ACTION(const State state,const Token& ttoken);//返回 LL语法分析表中行为uToken,列为tToken中的元素 
+        Action GOTO(const State state,const Token& utoken);
+        
+        
+        
+    private:
+        State start;    //开始符号 
+        Token end;        //结束符号
+        
+        vector<Token::Property> uTokens;//非终结符号集 
+        vector<Token::Property> tTokens;//终结符号集 
+        vector<Token::Property> operator_1;
+        vector<Token::Property> operator_2;
+        vector<Token::Property> operator_3;
+        vector<Token::Property> operator_4;
+        vector<Token::Property> operator_5;
+        
+        vector<string> Error;
+        vector<eExpr> eExprs;//表达式集合 
+        
+        stack<Token> tStack;
+        stack<State> sStack;
+        stack<Token::Value> vStack;
+	    stack<string> dStack;
+        
+        unsigned int uTokenCount;//非终结符号数量 
+        unsigned int tTokenCount;//终结符号数量
+        
+        string matrix[ROW][COL];//LL语法分析表 
+        
+};
