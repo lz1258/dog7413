@@ -1,4 +1,3 @@
-
 [cpp] view plaincopy
 <span style="font-size:13px;">/* Function: Init_Disp() 
  * Usage: init and display the interface 
