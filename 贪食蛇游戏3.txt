@@ -1,0 +1,74 @@
+[cpp] view plaincopy  
+/* Function: set_ticker(number_of_milliseconds) 
+ * Usage: arrange for interval timer to issue SIGALRM's at regular intervals 
+ * Return: -1 on error, 0 for ok 
+ * arg in milliseconds, converted into whole seconds and microseconds 
+ * note: set_ticker(0) turns off ticker 
+ */  
+int set_ticker(int n_msecs)  
+{  
+    struct itimerval new_timeset;  
+    long n_sec, n_usecs;  
+  
+    n_sec = n_msecs / 1000;                 /* int second part */  
+    n_usecs = (n_msecs % 1000) * 1000L;     /* microsecond part */  
+  
+    new_timeset.it_interval.tv_sec = n_sec; /* set reload */  
+    new_timeset.it_interval.tv_usec = n_usecs;  
+  
+    new_timeset.it_value.tv_sec = n_sec;    /* set new ticker value */  
+    new_timeset.it_value.tv_usec = n_usecs;  
+  
+    return setitimer(ITIMER_REAL, &new_timeset, NULL);  
+}  
+　　蛇的移动的函数代码如下：
+[cpp] view plaincopy
+void Snake_Move()  
+{  
+    static int length = 1;      /* length of snake */  
+    int Length_Flag = 0;        /* default snake's length no change */  
+    int moved = 0;  
+    signal(SIGALRM, SIG_IGN);  
+    /* judge if the snake crash the wall */  
+    if((head->next->x_pos == RIGHT_EDGE-1 && x_dir == 1)   
+        || (head->next->x_pos == LEFT_EDGE+1 && x_dir == -1)  
+        || (head->next->y_pos == TOP_ROW+1 && y_dir == -1)  
+        || (head->next->y_pos == BOT_ROW-1 && y_dir == 1))  
+    {  
+        gameover(1);  
+    }  
+    /* judge if the snake crash itself */  
+    if(mvinch(head->next->y_pos + y_dir, head->next->x_pos + x_dir) == '@')  
+        gameover(2);  
+  
+    if(ttm > 0 && ttg-- == 1)  
+    {  
+        /* snake moves */  
+        DLL_Snake_Insert(head->next->x_pos + x_dir, head->next->y_pos + y_dir);  
+        ttg = ttm;      /* reset */  
+        moved = 1;      /* snake can move */  
+    }  
+    if(moved)  
+    {  
+        /* snake eat the food */  
+        if(head->next->x_pos == food.x_pos && head->next->y_pos == food.y_pos)  
+        {  
+            Length_Flag = 1;  
+            length++;  
+            /* Mission Complete */  
+            if(length >= MAX_NODE)  
+                gameover(0);  
+            /* reset display the food randomly */  
+            Food_Disp();  
+        }  
+        if(Length_Flag == 0)  
+        {  
+            /* delete the tail->prev node */  
+            mvaddch(tail->prev->y_pos, tail->prev->x_pos, ' ');  
+            DLL_Snake_Delete_Node();  
+        }  
+        mvaddch(head->next->y_pos, head->next->x_pos, SNAKE_SYMBOL);  
+        refresh();  
+    }  
+    signal(SIGALRM, Snake_Move);  
+}  
